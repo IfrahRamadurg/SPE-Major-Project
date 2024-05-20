@@ -2,6 +2,8 @@ package org.example.jobportal.Services;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.example.jobportal.Configurations.JwtService;
 import org.example.jobportal.Entities.ApplicantDetails;
 import org.example.jobportal.Entities.ApplicantJobMapping;
@@ -27,14 +29,17 @@ public class ConsentService {
     private final ApplicantRepository applicantRepository;
     private final JobRepository jobRepository;
     private final JwtService jwtService;
+    private static final Logger logger = LogManager.getLogger(ConsentService.class);
 
     public boolean userConsent(HttpServletRequest request, Integer jobId, boolean consent) {
+        logger.info("Inside userConsent service");
         Integer loginId = jwtService.extractId(request, "loginId");
+        logger.info("loginId: " + loginId);
         Optional<ApplicantDetails> applicantDetails = applicantRepository.findByUser_LoginId(loginId);
         if (applicantDetails.isPresent()) {
             ApplicantDetails applicantDetail = applicantDetails.get();
             Integer applicantId = applicantDetail.getApplicantId();
-
+            logger.info("applicantId: " + applicantId);
             String url = "http://localhost:8083/jobPortal/consent/add";
 
             HttpHeaders headers = new HttpHeaders();
@@ -44,7 +49,7 @@ public class ConsentService {
             HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
             String response = restTemplate.postForObject(url, entity, String.class);
-
+            logger.info("response: " + response);
             if ("Failed to add consent to blockchain".equals(response)) {
                 return false;
             }
@@ -58,23 +63,32 @@ public class ConsentService {
                 applicantJobMapping.setJob(job);
                 applicantJobMapping.setHash(response);
                 applicantJobMappingRepository.save(applicantJobMapping);
-
+                logger.info("Added consent to blockchain");
+                logger.info("End of userConsent service");
                 return true;
             }
         }
+        logger.error("Failed to add consent to blockchain");
+        logger.info("End of userConsent service");
         return false;
     }
 
     public List<Integer> getUserConsent(HttpServletRequest request, Integer jobId) {
-       List<Integer> users=new ArrayList<>();
+        logger.info("Inside getUserConsent service");
+        List<Integer> users=new ArrayList<>();
        List<ApplicantJobMapping> applicantJobMappingOptional=applicantJobMappingRepository.findByJob_JobId(jobId);
+       logger.info("applicantJobMappingOptional: " + applicantJobMappingOptional.toString());
        for(ApplicantJobMapping applicantJobMapping:applicantJobMappingOptional){
            String hash=applicantJobMapping.getHash();
            String url = "http://localhost:8083/jobPortal/consent/get?hash=" + hash;
+           logger.info("url: " + url);
            if(Boolean.TRUE.equals(restTemplate.getForObject(url, Boolean.class))){
+               logger.info("applicant id:"+applicantJobMapping.getApplicantDetails().getApplicantId());
                users.add(applicantJobMapping.getApplicantDetails().getApplicantId());
            }
        }
+       logger.info("List of users who have given consent: " + users.toString());
+       logger.info("End of getUserConsent service");
        return users;
     }
 }
