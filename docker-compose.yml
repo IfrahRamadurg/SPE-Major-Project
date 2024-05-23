@@ -1,0 +1,84 @@
+# version: '3.8'
+
+services:
+  jobportaldb:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin@1234
+      MYSQL_DATABASE: jobPortal
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
+    volumes:
+      - ./mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      retries: 5
+      timeout: 60s
+  
+
+#  check-patientdb-started:
+#    image: jwilder/dockerize:0.6.1
+#    depends_on:
+#      patientdb:
+#        condition: service_healthy
+#    command: 'dockerize -wait=tcp://patientdb:3307'
+#    # command: 'dockerize -wait=tcp://patientdb:3308'
+#
+#  # check-cmsdb-started:
+#  #   image: jwilder/dockerize:0.6.1
+#  #   depends_on:
+#  #     cmsdb:
+#  #       condition: service_healthy
+#  #   command: 'dockerize -wait=tcp://patientdb:3308'
+#
+  job-service:
+    image: halwaikeladdoo/jobportal
+    # command:
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://jobportaldb/jobPortal?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin@1234
+    depends_on:
+      jobportaldb:
+              condition: service_healthy
+    restart: on-failure:1
+
+  
+#
+#  check-admindb-started:
+#    image: jwilder/dockerize:0.6.1
+#    depends_on:
+#      admindb:
+#        condition: service_healthy
+#    command: 'dockerize -wait=tcp://admindb:3309'
+#    # command: 'dockerize -wait=tcp://patientdb:3308'
+#
+#  check-cmsdb-started:
+#    image: jwilder/dockerize:0.6.1
+#    depends_on:
+#      cmsdb:
+#        condition: service_healthy
+#    command: 'dockerize -wait=tcp://cmsdb:3308'
+#
+  
+  jobportalapp:
+    image: halwaikeladdoo/jobportalfrontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - job-service
+
+
+#
+#  docker-compose -f Docker-compose-all.yml up
+
+
+# docker run --name patient-service --network patientapp-net -p 8081:8080 -d patient-service:latest
+# docker run --name patientdb --network patientapp-net
+# --mount type=bind,source=/media/karishma/473c21eb-0090-4791-8d4c-c6e6ebe14bac/volumes,target=/var/lib/mysql
+# -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=patient_schema -d mysql:latest
+# docker run -it --name patientapp2 --network patientapp-net -p 3084:3000 patientapp:latest

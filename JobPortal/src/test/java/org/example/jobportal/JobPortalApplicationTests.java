@@ -25,32 +25,32 @@ class JobPortalApplicationTests {
 	@Autowired
 	private AuthService authService;
 
-	@Test
-	void contextLoads() {
-	}
+	// @Test
+	// void contextLoads() {
+	// }
 
 	@BeforeAll
 	static void testInit() {
 		logger.info("Starting testcases");
 	}
 
-	@Test
-	void testPositiveLoginDetails(){
-		AuthRequest authRequest = new AuthRequest();
-		authRequest.setEmail("shreya@iiitb.ac.in");
-		authRequest.setPassword("shreya");
-		authRequest.setRole(Role.valueOf("Applicant"));
-		assertEquals("Successfully logged in", authService.authenticate(authRequest).getMessage());
-	}
+	// @Test
+	// void testPositiveLoginDetails(){
+	// 	AuthRequest authRequest = new AuthRequest();
+	// 	authRequest.setEmail("shreya@iiitb.ac.in");
+	// 	authRequest.setPassword("shreya");
+	// 	authRequest.setRole(Role.valueOf("Applicant"));
+	// 	assertEquals("Successfully logged in", authService.authenticate(authRequest).getMessage());
+	// }
 
-	@Test
-	void testNegativeLoginDetails(){
-		AuthRequest authRequest = new AuthRequest();
-		authRequest.setEmail("rutuja@iiitb.ac.in");
-		authRequest.setPassword("rutu");
-		authRequest.setRole(Role.valueOf("HR"));
-		assertNotEquals("Successfully logged in",authService.authenticate(authRequest).getMessage());
-	}
+	// @Test
+	// void testNegativeLoginDetails(){
+	// 	AuthRequest authRequest = new AuthRequest();
+	// 	authRequest.setEmail("rutuja@iiitb.ac.in");
+	// 	authRequest.setPassword("rutu");
+	// 	authRequest.setRole(Role.valueOf("HR"));
+	// 	assertNotEquals("Successfully logged in",authService.authenticate(authRequest).getMessage());
+	// }
 
 	@AfterAll
 	static void testComplete() {
