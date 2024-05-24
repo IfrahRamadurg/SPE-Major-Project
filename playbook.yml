@@ -1,7 +1,7 @@
 ---
 - name: Use docker compose to run all containers
   hosts: localhost
-  remote_user: root
+  remote_user: ifrah
   become: 
   tasks:
     - name: Start docker service
