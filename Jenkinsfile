@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_REPO_URL = 'https://github.com/IfrahRamadurg/SPE-Major-Project.git'
+        GITHUB_REPO_URL = 'https://github.com/Ashmi2004/SPE.git'
     }
 
     stages {
