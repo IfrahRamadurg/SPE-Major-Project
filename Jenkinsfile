@@ -66,8 +66,7 @@ pipeline {
         stage('Run Ansible Playbook') {
             steps {
                 echo 'Running ansible playbook yml file'
-                //sh 'ansible-playbook -i inventory.ini playbook.yml'
-                sh 'sleep 120'
+                sh 'ansible-playbook -i inventory.ini playbook.yml'
             }
         }
 
